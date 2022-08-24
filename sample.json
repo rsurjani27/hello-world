@@ -1,2 +1,7 @@
-Configuration item = ABC
-Assignment group = XYZ
+[
+  {
+
+      "Configuration item": "ABC",
+      "Assignment group" : "XYZ",
+  }
+]

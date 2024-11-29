@@ -1,9 +1,6 @@
 name: Talisman Security Scan
 
 on:
-  push:
-    branches:
-      - '**'  # This will run on pushes to any branch
   pull_request:
     branches:
       - '**'  # This will run on pull requests to any branch
@@ -25,19 +22,15 @@ jobs:
 
     - name: Run Talisman
       run: |
-        if [ "${{ github.event_name }}" == "pull_request" ]; then
-          git checkout -b talisman-scan
-          git reset --soft ${{ github.event.pull_request.base.sha }}
-          talisman --scan
-        else
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs talisman --scan
-        fi
+        git checkout -b talisman-scan
+        git reset --soft ${{ github.event.pull_request.base.sha }}
+        talisman --scan
       env:
         TALISMAN_HOME: ${{ github.workspace }}
 
     - name: Upload Talisman Report
       if: failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: talisman-report
         path: talisman_report/talisman_reports/data

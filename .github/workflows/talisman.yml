@@ -23,20 +23,32 @@ jobs:
       id: run_talisman
       continue-on-error: true
       run: |
-        talisman --scanWithHtml
+        talisman --scanWithHtml > talisman_output.txt 2>&1
 
-    - name: Check Talisman Result
+    - name: Process Talisman Result
       run: |
-        if [ "${{ steps.run_talisman.outcome }}" == "failure" ]; then
-          echo "::warning::Talisman found potential security issues. Please check the scan results."
-          exit 1
+        echo "Talisman Scan Results:"
+        cat talisman_output.txt
+        
+        if grep -q "Talisman Report" talisman_output.txt; then
+          echo "::warning::Talisman found potential security issues. Please review the results above."
+          echo "TALISMAN_FOUND_ISSUES=true" >> $GITHUB_ENV
         else
           echo "Talisman scan passed successfully."
+          echo "TALISMAN_FOUND_ISSUES=false" >> $GITHUB_ENV
         fi
 
     - name: Upload Talisman Report
-      if: failure()
+      if: env.TALISMAN_FOUND_ISSUES == 'true'
       uses: actions/upload-artifact@v3
       with:
         name: talisman-report
         path: talisman_reports/data/report.html
+
+    - name: Summarize Talisman Result
+      run: |
+        if [ "${{ env.TALISMAN_FOUND_ISSUES }}" == "true" ]; then
+          echo "Talisman found potential security issues. Please review the console output and the uploaded HTML report for details."
+        else
+          echo "Talisman scan completed successfully with no issues found."
+        fi

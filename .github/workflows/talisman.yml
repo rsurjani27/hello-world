@@ -14,22 +14,29 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Talisman Scan
-      uses: thoughtworks/talisman-action@v1
+    - name: Install Talisman
+      run: |
+        curl --silent --location https://github.com/thoughtworks/talisman/releases/latest/download/talisman_linux_amd64 --output /usr/local/bin/talisman
+        chmod +x /usr/local/bin/talisman
+
+    - name: Run Talisman
+      id: run_talisman
       continue-on-error: true
-      id: talisman
+      run: |
+        talisman --scanWithHtml
 
     - name: Check Talisman Result
       run: |
-        if [ "${{ steps.talisman.outcome }}" == "failure" ]; then
+        if [ "${{ steps.run_talisman.outcome }}" == "failure" ]; then
           echo "::warning::Talisman found potential security issues. Please check the scan results."
+          exit 1
         else
           echo "Talisman scan passed successfully."
         fi
 
     - name: Upload Talisman Report
-      if: steps.talisman.outcome == 'failure'
+      if: failure()
       uses: actions/upload-artifact@v3
       with:
         name: talisman-report
-        path: talisman.scan.log
+        path: talisman_reports/data/report.html

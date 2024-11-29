@@ -1,0 +1,17 @@
+name: Semgrep SAST Scan
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  semgrep:
+    name: Scan
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - uses: actions/checkout@v2
+      - run: semgrep ci
+        env:
+          SEMGREP_RULES: p/default

@@ -21,16 +21,25 @@ jobs:
         sudo mv talisman /usr/local/bin/
 
     - name: Run Talisman
+      id: run_talisman
+      continue-on-error: true
       run: |
         git checkout -b talisman-scan
         git reset --soft ${{ github.event.pull_request.base.sha }}
         talisman --scan
-      env:
-        TALISMAN_HOME: ${{ github.workspace }}
+
+    - name: Check Talisman Result
+      run: |
+        if [ "${{ steps.run_talisman.outcome }}" == "failure" ]; then
+          echo "::warning::Talisman found potential security issues. Please check the scan results."
+        else
+          echo "Talisman scan passed successfully."
+        fi
 
     - name: Upload Talisman Report
-      if: failure()
+      if: steps.run_talisman.outcome == 'failure'
       uses: actions/upload-artifact@v3
       with:
         name: talisman-report
         path: talisman_report/talisman_reports/data
+

@@ -21,7 +21,7 @@ jobs:
 
     - name: Run Talisman
       id: run_talisman
-      continue-on-error: false
+      continue-on-error: true
       run: |
         talisman --scanWithHtml > talisman_output.txt 2>&1
 

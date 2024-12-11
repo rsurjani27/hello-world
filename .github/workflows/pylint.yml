@@ -25,3 +25,5 @@ jobs:
       run: |
         pylint $(git ls-files '*.py')
     - name: Scan for secrets
+      run: |
+        ls -ltr

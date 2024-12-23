@@ -1,5 +1,4 @@
-# this file is used for testing purpose in my personal github account..
-import os
+# this file is used for testing purpose in my personal github account...
 import subprocess
 
 def insecure_function(user_input):

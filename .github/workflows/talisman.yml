@@ -40,7 +40,7 @@ jobs:
 
     - name: Upload Talisman Report
       if: env.TALISMAN_FOUND_ISSUES == 'true'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: talisman-report
         path: talisman_reports/data/report.html
